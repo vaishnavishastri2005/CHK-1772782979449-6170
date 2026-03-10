@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ERS – Report Emergency</title>
+  <meta name="description" content="Report an emergency with your GPS location, emergency type and severity level."/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚑</div><span>ERS System</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Dashboard</a></li>
+    <li><a href="report.html" class="active">Report Emergency</a></li>
+    <li><a href="ambulance.html">Ambulance Routing</a></li>
+    <li><a href="hospital.html">Hospitals</a></li>
+    <li><a href="impact.html">Impact</a></li>
+    <li><a href="future.html">Future Vision</a></li>
+  </ul>
+  <div class="nav-cta">
+    <div class="ws-indicator"><div class="ws-dot"></div><span class="ws-status-text">Connecting…</span></div>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+
+  <div id="success-overlay" style="display:none;position:fixed;inset:0;background:rgba(8,12,16,0.95);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;text-align:center;">
+    <div style="font-size:5rem;animation:bounceIn 0.6s ease;">🚑</div>
+    <h2 style="font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;color:var(--success);">Emergency Reported!</h2>
+    <p style="color:var(--text-sub);max-width:400px;">Your request is being processed. An ambulance will be dispatched to your location immediately.</p>
+    <div id="success-details" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;min-width:320px;text-align:left;"></div>
+    <div style="display:flex;gap:12px;">
+      <button onclick="hideSuccess()" class="btn btn-ghost">Report Another</button>
+      <a href="index.html" class="btn btn-primary">← Dashboard</a>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container" style="max-width:860px;">
+      <div class="section-header">
+        <div class="section-tag">🚨 EMERGENCY REPORTING</div>
+        <h1 class="section-title">Report an Emergency</h1>
+        <p class="section-subtitle">Fill in the details below. GPS location is captured automatically for fastest dispatch.</p>
+      </div>
+
+      <div class="grid-2" style="gap:2rem;align-items:start;">
+
+        <div class="card" style="padding:2rem;">
+          <form id="emergency-form">
+
+            <div class="form-group">
+              <label class="form-label">Patient Name *</label>
+              <input id="patient_name" type="text" class="form-control" placeholder="Full name of patient" required/>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Emergency Type *</label>
+              <select id="emergency_type" class="form-control" required>
+                <option value="">Select emergency type</option>
+                <option>Accident</option>
+                <option>Heart Attack</option>
+                <option>Stroke</option>
+                <option>Fire</option>
+                <option>Drowning</option>
+                <option>Trauma</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Severity Level *</label>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+                <input id="severity" type="range" class="severity-slider" min="1" max="5" value="3" style="flex:1;"/>
+                <span id="severity-label" style="font-size:0.9rem;font-weight:600;min-width:90px;">🟠 Moderate</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-muted);margin-top:4px;">
+                <span>1 - Low</span><span>3 - Moderate</span><span>5 - Critical</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description (optional)</label>
+              <textarea id="description" class="form-control" placeholder="Briefly describe the emergency situation…"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <div style="display:flex;gap:8px;">
+                <input id="address" type="text" class="form-control" placeholder="Address / Landmark" style="flex:1;"/>
+                <button type="button" id="gps-btn" class="btn btn-ghost" onclick="detectGPS()">📍 GPS</button>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:6px;">
+                <input id="latitude" type="number" step="any" class="form-control" placeholder="Latitude" style="flex:1;" required/>
+                <input id="longitude" type="number" step="any" class="form-control" placeholder="Longitude" style="flex:1;" required/>
+              </div>
+              <p id="gps-status" style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;"></p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-full btn-pulse" id="submit-btn">
+              🚨 Send Emergency Request
+            </button>
+
+          </form>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1.2rem;">
+
+          <div class="card">
+            <h3 style="font-family:'Space Grotesk',sans-serif;margin-bottom:1rem;">⚡ What happens next?</h3>
+
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <div class="step-title">Request Received</div>
+                <div class="step-desc">System instantly logs your emergency with GPS location</div>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <div class="step-title">Ambulance Dispatched</div>
+                <div class="step-desc">Nearest available ambulance is assigned automatically</div>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <div class="step-title">Hospital Alerted</div>
+                <div class="step-desc">Target hospital is notified with patient details and ETA</div>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-num">4</div>
+              <div class="step-text">
+                <div class="step-title">Live Tracking</div>
+                <div class="step-desc">Realtime updates streamed to all parties</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="card">
+            <h3 style="font-family:'Space Grotesk',sans-serif;margin-bottom:1rem;">Emergency Type Guide</h3>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div class="feature-tag">🚗 Accident</div>
+              <div class="feature-tag">❤️ Heart Attack</div>
+              <div class="feature-tag">🧠 Stroke</div>
+              <div class="feature-tag">🔥 Fire</div>
+              <div class="feature-tag">💧 Drowning</div>
+              <div class="feature-tag">🩸 Trauma</div>
+            </div>
+
+            <p style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted);">
+              For life-threatening emergencies select severity 4 or 5 for highest priority.
+            </p>
+          </div>
+
+          <div class="card" id="gps-info-card" style="text-align:center;padding:1.5rem;">
+            <div style="font-size:3rem;margin-bottom:0.8rem;">📍</div>
+            <h4 style="margin-bottom:0.4rem;">Auto GPS Detection</h4>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+              Click the GPS button to automatically detect your coordinates.
+            </p>
+            <button class="btn btn-accent btn-full" onclick="detectGPS()">📍 Detect My Location</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/app.js"></script>
+<script>
+
+const severityLabels = {1:'🟢 Low',2:'🟡 Mild',3:'🟠 Moderate',4:'🔴 High',5:'🚨 Critical'};
+
+document.getElementById('severity').addEventListener('input',function(){
+  document.getElementById('severity-label').textContent=severityLabels[this.value];
+});
+
+async function detectGPS(){
+  const btn=document.getElementById('gps-btn');
+  const status=document.getElementById('gps-status');
+
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>';
+  status.textContent='Detecting location…';
+
+  try{
+    const pos=await getGPS();
+
+    document.getElementById('latitude').value=pos.coords.latitude.toFixed(6);
+    document.getElementById('longitude').value=pos.coords.longitude.toFixed(6);
+
+    status.textContent=`GPS detected: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+    status.style.color='var(--success)';
+
+    showToast('GPS Detected','Your location has been captured.','success');
+
+  }catch(e){
+
+    status.textContent='GPS unavailable. Enter coordinates manually.';
+    status.style.color='var(--primary)';
+
+    document.getElementById('latitude').value='12.9716';
+    document.getElementById('longitude').value='77.5946';
+
+    showToast('GPS Fallback','Using demo location (Bengaluru).','warning');
+  }
+
+  btn.disabled=false;
+  btn.textContent='📍 GPS';
+}
+
+document.getElementById('emergency-form').addEventListener('submit',async(e)=>{
+
+  e.preventDefault();
+
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> Sending…';
+
+  const body={
+    patient_name:document.getElementById('patient_name').value,
+    emergency_type:document.getElementById('emergency_type').value,
+    severity:parseInt(document.getElementById('severity').value),
+    description:document.getElementById('description').value,
+    latitude:parseFloat(document.getElementById('latitude').value),
+    longitude:parseFloat(document.getElementById('longitude').value),
+    address:document.getElementById('address').value
+  };
+
+  try{
+
+    const res=await apiPost('/emergencies',body);
+
+    if(res.success){
+
+      const d=res.data;
+
+      document.getElementById('success-details').innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Emergency ID</span><strong>#${d.id}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Type</span><strong>${d.emergency_type}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Severity</span><strong>${severityLabels[d.severity]}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Status</span><span class="badge badge-pending">Pending Dispatch</span></div>
+      </div>
+      `;
+
+      const overlay=document.getElementById('success-overlay');
+      overlay.style.display='flex';
+
+      setTimeout(()=>apiPost('/ambulances/assign',{emergency_id:d.id,lat:d.latitude,lng:d.longitude}),1500);
+
+    }else{
+
+      showToast('Error',res.error||'Failed to submit.','error');
+    }
+
+  }catch(err){
+
+    showToast('Network Error','Could not connect to server.','error');
+  }
+
+  btn.disabled=false;
+  btn.innerHTML='🚨 Send Emergency Request';
+});
+
+function hideSuccess(){
+
+  document.getElementById('success-overlay').style.display='none';
+  document.getElementById('emergency-form').reset();
+  document.getElementById('severity-label').textContent='🟠 Moderate';
+  document.getElementById('gps-status').textContent='';
+}
+
+window.addEventListener('DOMContentLoaded',()=>setTimeout(detectGPS,500));
+
+</script>
+</body>
+</html>

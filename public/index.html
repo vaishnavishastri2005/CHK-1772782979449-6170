@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ERS – Emergency Response System Dashboard</title>
+<meta name="description" content="Real-Time Emergency Response System – Smart ambulance dispatch, hospital coordination, and AI-powered routing."/>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+
+<nav class="navbar">
+<a href="index.html" class="nav-logo">
+<div class="logo-icon">🚑</div>
+<span>ERS System</span>
+</a>
+
+<ul class="nav-links">
+<li><a href="index.html" class="active">Dashboard</a></li>
+<li><a href="report.html">Report Emergency</a></li>
+<li><a href="ambulance.html">Ambulance Routing</a></li>
+<li><a href="hospital.html">Hospitals</a></li>
+<li><a href="impact.html">Impact</a></li>
+<li><a href="future.html">Future Vision</a></li>
+</ul>
+
+<div class="nav-cta">
+<div class="ws-indicator">
+<div class="ws-dot" id="ws-dot"></div>
+<span class="ws-status-text">Connecting…</span>
+</div>
+<a href="report.html" class="btn btn-primary btn-pulse">🚨 Report Emergency</a>
+</div>
+</nav>
+
+<div class="page-wrapper">
+
+<section class="hero" style="padding: 4rem 0;">
+<div class="hero-bg-orb orb-1"></div>
+<div class="hero-bg-orb orb-2"></div>
+
+<div class="container">
+<div class="hero-content">
+
+<div class="hero-tag">🔴 LIVE SYSTEM ACTIVE</div>
+
+<h1 class="hero-title">
+Real-Time<br/>
+<span>Emergency</span><br/>
+Response System
+</h1>
+
+<p class="hero-sub">
+Smart ambulance allocation, traffic-optimized routing, and instant hospital coordination — saving lives through technology.
+</p>
+
+<div class="hero-actions">
+<a href="report.html" class="btn btn-primary btn-lg">🚨 Report Emergency</a>
+<a href="ambulance.html" class="btn btn-ghost btn-lg">📍 Track Ambulances</a>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="section" style="padding-top:0;">
+<div class="container">
+
+<div class="grid-4" id="stats-grid">
+
+<div class="stat-card">
+<div class="stat-icon red">🚨</div>
+<div class="stat-value" id="stat-active">—</div>
+<div class="stat-label">Active Emergencies</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon blue">🚑</div>
+<div class="stat-value" id="stat-ambulances">—</div>
+<div class="stat-label">Ambulances Available</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon green">🏥</div>
+<div class="stat-value" id="stat-beds">—</div>
+<div class="stat-label">Hospital Beds Open</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon gold">⏱</div>
+<div class="stat-value" id="stat-resolved">—</div>
+<div class="stat-label">Resolved Today</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="section" style="padding-top:0;">
+<div class="container">
+
+<div class="grid-2" style="gap:2rem; align-items:start;">
+
+<div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+<h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;">🔴 Live Emergency Feed</h2>
+<span class="badge badge-pending" id="feed-count">Loading…</span>
+</div>
+
+<div class="card" style="padding:0;">
+<div id="emergency-feed" style="padding:1rem 1.5rem;">
+<div class="feed-item">
+<div class="feed-dot red"></div>
+<div class="feed-content">
+<div class="feed-title">Loading emergencies…</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="margin-top:1rem;display:flex;gap:10px;">
+<a href="report.html" class="btn btn-primary btn-full">🚨 Report New Emergency</a>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+<div>
+<h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:1rem;">🚑 Ambulance Fleet Status</h2>
+
+<div id="ambulance-list" style="display:flex;flex-direction:column;gap:10px;">
+<div class="ambulance-card">
+<div class="amb-avatar">🚑</div>
+<div class="amb-info">
+<div class="amb-name">Loading fleet…</div>
+</div>
+</div>
+</div>
+
+<a href="ambulance.html" class="btn btn-ghost btn-full" style="margin-top:10px;">View Full Map →</a>
+</div>
+
+<div class="card">
+
+<h3 style="font-family:'Space Grotesk',sans-serif;margin-bottom:1rem;">⚡ How It Works</h3>
+
+<div class="step-item">
+<div class="step-num">1</div>
+<div class="step-text">
+<div class="step-title">Report Emergency</div>
+<div class="step-desc">GPS auto-detects location, user fills emergency type & severity</div>
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-num">2</div>
+<div class="step-text">
+<div class="step-title">Nearest Ambulance Dispatched</div>
+<div class="step-desc">Algorithm finds and dispatches the closest available unit</div>
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-num">3</div>
+<div class="step-text">
+<div class="step-title">Traffic-Optimized Route</div>
+<div class="step-desc">Real-time traffic data calculates the fastest path</div>
+</div>
+</div>
+
+<div class="step-item">
+<div class="step-num">4</div>
+<div class="step-text">
+<div class="step-title">Hospital Alerted & Ready</div>
+<div class="step-desc">Hospital receives patient data and prepares in advance</div>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+</section>
+
+<footer style="padding:2rem;text-align:center;color:var(--text-muted);font-size:0.8rem;border-top:1px solid var(--border);">
+© 2024 Emergency Response System · Built for saving lives
+</footer>
+
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/app.js"></script>
+
+<script>
+
+async function loadDashboard() {
+try {
+
+const eRes = await apiGet('/emergencies');
+if (eRes.success) {
+
+const emergencies = eRes.data;
+
+const active   = emergencies.filter(e => ['pending','dispatched','en_route'].includes(e.status)).length;
+const resolved = emergencies.filter(e => e.status === 'resolved').length;
+
+document.getElementById('stat-active').textContent   = active;
+document.getElementById('stat-resolved').textContent = resolved;
+document.getElementById('feed-count').textContent    = `${emergencies.length} total`;
+
+renderFeed(emergencies.slice(0,6));
+
+}
+
+const aRes = await apiGet('/ambulances');
+if (aRes.success) {
+
+const available = aRes.data.filter(a => a.status === 'available').length;
+
+document.getElementById('stat-ambulances').textContent = available + '/' + aRes.data.length;
+
+renderAmbulances(aRes.data);
+
+}
+
+const hRes = await apiGet('/hospitals');
+if (hRes.success) {
+
+const totalBeds = hRes.data.reduce((s,h)=>s + h.available_beds,0);
+
+document.getElementById('stat-beds').textContent = totalBeds;
+
+}
+
+} catch(e){
+
+showToast('Connection Issue','Could not reach API. Is the server running?','warning');
+
+}
+}
+
+function renderFeed(emergencies){
+
+const feed = document.getElementById('emergency-feed');
+
+if(!emergencies.length){
+feed.innerHTML = '<div style="padding:1rem;color:var(--text-muted);font-size:0.9rem;">No emergencies yet.</div>';
+return;
+}
+
+const colorMap = { pending:'red', dispatched:'blue', en_route:'green', resolved:'', arrived:'green' };
+
+feed.innerHTML = emergencies.map(e=>`
+<div class="feed-item">
+<div class="feed-dot ${colorMap[e.status]||''}"></div>
+<div class="feed-content">
+<div class="feed-title">${e.emergency_type} – ${e.patient_name}&nbsp;&nbsp;<span class="badge badge-${e.status}">${e.status}</span></div>
+<div class="feed-sub">${e.address || 'Location: ' + e.latitude + ', ' + e.longitude}</div>
+</div>
+</div>
+`).join('');
+
+}
+
+function renderAmbulances(ambulances){
+
+const list = document.getElementById('ambulance-list');
+
+list.innerHTML = ambulances.map(a=>`
+<div class="ambulance-card">
+<div class="amb-avatar">🚑</div>
+<div class="amb-info">
+<div class="amb-name">${a.vehicle_number}</div>
+<div class="amb-detail">Driver: ${a.driver_name}</div>
+</div>
+<span class="badge badge-${a.status}">${a.status.replace('_',' ')}</span>
+</div>
+`).join('');
+
+}
+
+window.onWSMessage = (msg)=>{
+if(['new_emergency','emergency_status_update','ambulance_dispatched'].includes(msg.event)){
+showToast('Live Update',`${msg.event.replace(/_/g,' ')}`,'info');
+loadDashboard();
+}
+};
+
+document.addEventListener('DOMContentLoaded',loadDashboard);
+
+</script>
+
+</body>
+</html>

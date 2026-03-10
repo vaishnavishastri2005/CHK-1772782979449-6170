@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ERS – Hospital Coordination</title>
+<meta name="description" content="Real-time hospital bed availability, specialist status, and instant emergency alerts."/>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+
+<nav class="navbar">
+<a href="index.html" class="nav-logo"><div class="logo-icon">🚑</div><span>ERS System</span></a>
+
+<ul class="nav-links">
+<li><a href="index.html">Dashboard</a></li>
+<li><a href="report.html">Report Emergency</a></li>
+<li><a href="ambulance.html">Ambulance Routing</a></li>
+<li><a href="hospital.html" class="active">Hospitals</a></li>
+<li><a href="impact.html">Impact</a></li>
+<li><a href="future.html">Future Vision</a></li>
+</ul>
+
+<div class="nav-cta">
+<div class="ws-indicator"><div class="ws-dot"></div><span class="ws-status-text">Connecting…</span></div>
+<a href="report.html" class="btn btn-primary btn-pulse">🚨 Report Emergency</a>
+</div>
+</nav>
+
+<div class="page-wrapper">
+<section class="section">
+<div class="container">
+
+<div class="section-header">
+<div class="section-tag">🏥 HOSPITAL NETWORK</div>
+<h1 class="section-title">Hospital Coordination</h1>
+<p class="section-subtitle">Real-time bed availability, specialist status, and instant emergency alerts sent to the right hospital.</p>
+</div>
+
+<div class="grid-4" style="margin-bottom:2.5rem;">
+<div class="stat-card"><div class="stat-icon green">🛏</div><div class="stat-value" id="stat-total-beds">—</div><div class="stat-label">Beds Available</div></div>
+<div class="stat-card"><div class="stat-icon blue">🔬</div><div class="stat-value" id="stat-icu">—</div><div class="stat-label">ICU Available</div></div>
+<div class="stat-card"><div class="stat-icon red">🔔</div><div class="stat-value" id="stat-alert">—</div><div class="stat-label">On Alert</div></div>
+<div class="stat-card"><div class="stat-icon gold">🏥</div><div class="stat-value" id="stat-hospitals">—</div><div class="stat-label">Total Hospitals</div></div>
+</div>
+
+<div id="hospital-grid" class="grid-2" style="gap:1.5rem; margin-bottom:3rem;">
+<div class="card" style="text-align:center;padding:2rem;color:var(--text-muted);">
+<div class="spinner" style="margin:0 auto 1rem;"></div>Loading hospitals…
+</div>
+</div>
+
+<div class="grid-2" style="gap:2rem;align-items:start;">
+
+<div class="card" style="border-color:var(--border-red);">
+<h3 style="font-family:'Space Grotesk',sans-serif;margin-bottom:1.2rem;">🔔 Send Hospital Alert</h3>
+
+<div class="form-group">
+<label class="form-label">Select Hospital</label>
+<select id="alert-hospital" class="form-control">
+<option value="">Loading hospitals…</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label">Emergency ID (optional)</label>
+<input id="alert-eid" type="number" class="form-control" placeholder="Enter emergency ID"/>
+</div>
+
+<div class="form-group">
+<label class="form-label">Alert Message</label>
+<textarea id="alert-msg" class="form-control" rows="3" placeholder="Patient details, ETA, requirements…"></textarea>
+</div>
+
+<button class="btn btn-primary btn-full" onclick="sendAlert()">🔔 Send Instant Alert</button>
+<div id="alert-result" style="margin-top:1rem;"></div>
+</div>
+
+<div class="card">
+<h3 style="font-family:'Space Grotesk',sans-serif;margin-bottom:1.2rem;">🛏 Update Bed Availability</h3>
+
+<div class="form-group">
+<label class="form-label">Select Hospital</label>
+<select id="bed-hospital" class="form-control">
+<option value="">Select hospital</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label">Available General Beds</label>
+<input id="bed-general" type="number" class="form-control" placeholder="e.g. 45" min="0"/>
+</div>
+
+<div class="form-group">
+<label class="form-label">Available ICU Beds</label>
+<input id="bed-icu" type="number" class="form-control" placeholder="e.g. 8" min="0"/>
+</div>
+
+<button class="btn btn-accent btn-full" onclick="updateBeds()">💾 Update Bed Count</button>
+<div id="bed-result" style="margin-top:1rem;"></div>
+</div>
+
+</div>
+
+<div style="margin-top:3rem;">
+<h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;margin-bottom:1rem;">🔔 Recent Hospital Alerts</h2>
+
+<div class="card" id="notif-feed" style="padding:0;">
+<div style="padding:1.5rem;color:var(--text-muted);">Loading notifications…</div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/app.js"></script>
+
+<script>
+
+let hospitalsData = [];
+
+function bedFillClass(pct){
+if(pct>50)return'bed-fill-high';
+if(pct>20)return'bed-fill-medium';
+return'bed-fill-low';
+}
+
+function renderHospitalCard(h){
+
+const bedPct=h.total_beds?Math.round((h.available_beds/h.total_beds)*100):0;
+const icuPct=h.icu_beds?Math.round((h.available_icu_beds/h.icu_beds)*100):0;
+const isAlert=h.on_alert;
+
+return`
+<div class="hospital-card ${isAlert?'on-alert':''}" id="hcard-${h.id}">
+
+<div class="hospital-header">
+<div>
+<div class="hospital-name">${h.name}</div>
+<div class="hospital-addr">📍 ${h.address}</div>
+<div class="hospital-addr" style="margin-top:2px;">📞 ${h.phone}</div>
+</div>
+${isAlert?'<span class="badge badge-alert">🔔 ON ALERT</span>':'<span class="badge badge-available">⟳ Ready</span>'}
+</div>
+
+<div class="bed-stats">
+
+<div class="bed-stat">
+<div class="bed-stat-value" style="color:var(--success);">${h.available_beds}</div>
+<div class="bed-stat-label">beds free</div>
+</div>
+
+<div class="bed-stat">
+<div class="bed-stat-value" style="color:var(--accent);">${h.available_icu_beds}</div>
+<div class="bed-stat-label">ICU free</div>
+</div>
+
+<div class="bed-stat">
+<div class="bed-stat-value">${h.total_beds}</div>
+<div class="bed-stat-label">total beds</div>
+</div>
+
+</div>
+
+<div>
+<div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-bottom:3px;">
+<span>General Beds</span><span>${bedPct}% available</span>
+</div>
+
+<div class="bed-meter">
+<div class="bed-meter-fill ${bedFillClass(bedPct)}" style="width:${bedPct}%;"></div>
+</div>
+</div>
+
+<div style="margin-top:8px;">
+<div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-bottom:3px;">
+<span>ICU</span><span>${icuPct}%</span>
+</div>
+
+<div class="bed-meter">
+<div class="bed-meter-fill ${bedFillClass(icuPct)}" style="width:${icuPct}%;"></div>
+</div>
+</div>
+
+</div>
+`;
+}
+
+async function loadHospitals(){
+
+const res=await apiGet('/hospitals');
+if(!res.success)return;
+
+hospitalsData=res.data;
+
+const total=res.data.length;
+const beds=res.data.reduce((s,h)=>s+h.available_beds,0);
+const icu=res.data.reduce((s,h)=>s+h.available_icu_beds,0);
+const onAlert=res.data.filter(h=>h.on_alert).length;
+
+document.getElementById('stat-total-beds').textContent=beds;
+document.getElementById('stat-icu').textContent=icu;
+document.getElementById('stat-alert').textContent=onAlert;
+document.getElementById('stat-hospitals').textContent=total;
+
+document.getElementById('hospital-grid').innerHTML=res.data.map(renderHospitalCard).join('');
+
+const opts=res.data.map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
+
+document.getElementById('alert-hospital').innerHTML='<option value="">Select hospital</option>'+opts;
+document.getElementById('bed-hospital').innerHTML='<option value="">Select hospital</option>'+opts;
+
+}
+
+document.addEventListener('DOMContentLoaded',async()=>{
+await loadHospitals();
+});
+
+</script>
+
+</body>
+</html>

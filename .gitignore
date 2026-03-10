@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables (sensitive - DO NOT commit)
+.env
+public/routes/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Build output
+dist/
+build/
+
+# Database credentials
+*.sqlite
+*.sqlite3

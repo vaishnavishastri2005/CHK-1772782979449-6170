@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ERS – Impact & Benefits</title>
+<meta name="description" content="See the real-world impact of smart emergency response — faster ambulances, better outcomes."/>
+<link rel="stylesheet" href="css/style.css"/>
+
+<style>
+.counter{font-family:'Space Grotesk',sans-serif;font-size:3rem;font-weight:800;line-height:1;}
+.before-after{
+display:grid;
+grid-template-columns:1fr auto 1fr;
+gap:0;
+align-items:center;
+background:var(--bg-card);
+border:1px solid var(--border);
+border-radius:var(--radius-lg);
+overflow:hidden;
+}
+.ba-side{padding:2.5rem 2rem;}
+.ba-side.before{border-right:1px solid var(--border);}
+.ba-side.after{border-left:1px solid var(--border);background:rgba(255,59,59,0.03);}
+.ba-divider{width:60px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;}
+.ba-arrow{color:var(--primary);font-size:2rem;}
+.ba-label{font-size:0.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.1em;writing-mode:vertical-lr;}
+.ba-time{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:800;}
+.ba-time.bad{color:#FF6B6B;}
+.ba-time.good{color:var(--success);}
+.benefit-icon{font-size:2.5rem;}
+@keyframes countUp{
+from{opacity:0;transform:translateY(10px);}
+to{opacity:1;transform:translateY(0);}
+}
+.icon-glow{filter:drop-shadow(0 0 8px currentColor);}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+<a href="index.html" class="nav-logo"><div class="logo-icon"></div><span>ERS System</span></a>
+<ul class="nav-links">
+<li><a href="index.html">Dashboard</a></li>
+<li><a href="report.html">Report Emergency</a></li>
+<li><a href="ambulance.html">Ambulance Routing</a></li>
+<li><a href="hospital.html">Hospitals</a></li>
+<li><a href="impact.html" class="active">Impact</a></li>
+<li><a href="future.html">Future Vision</a></li>
+</ul>
+<div class="nav-cta">
+<div class="ws-indicator">
+<div class="ws-dot"></div>
+<span class="ws-status-text">Connecting…</span>
+</div>
+</div>
+</nav>
+
+<div class="page-wrapper">
+
+<section style="padding:5rem 0 3rem;text-align:center;position:relative;overflow:hidden;">
+<div class="hero-bg-orb orb-1"></div>
+<div class="container">
+<div class="section-tag" style="margin:0 auto 1.5rem;">📊 IMPACT & RESULTS</div>
+<h1 class="section-title" style="font-size:3rem;">Every Second Counts</h1>
+<p class="section-subtitle" style="margin:0 auto;">Smart emergency response can reduce ambulance arrival time by up to <strong style="color:var(--primary);">60%</strong>, directly improving survival rates.</p>
+</div>
+</section>
+
+<section class="section" style="padding-top:0;">
+<div class="container">
+
+<div class="grid-4" style="text-align:center;margin-bottom:3rem;">
+
+<div class="card">
+<div class="counter" style="color:var(--primary);" data-target="60">0</div>
+<div style="font-size:1.2rem;font-weight:700;margin-top:4px;">%</div>
+<div style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Faster Response Time</div>
+</div>
+
+<div class="card">
+<div class="counter" style="color:var(--success);" data-target="40">0</div>
+<div style="font-size:1.2rem;font-weight:700;margin-top:4px;">%</div>
+<div style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Better Survival Rate</div>
+</div>
+
+<div class="card">
+<div class="counter" style="color:var(--accent);" data-target="85">0</div>
+<div style="font-size:1.2rem;font-weight:700;margin-top:4px;">%</div>
+<div style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Hospital Prep Success</div>
+</div>
+
+<div class="card">
+<div class="counter" style="color:var(--warning);" data-target="24">0</div>
+<div style="font-size:1.2rem;font-weight:700;margin-top:4px;">×7</div>
+<div style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Hour Monitoring</div>
+</div>
+
+</div>
+
+<footer style="padding:2rem;text-align:center;color:var(--text-muted);font-size:0.8rem;border-top:1px solid var(--border);">
+© 2024 Emergency Response System · Built for saving lives
+</footer>
+
+</div>
+</section>
+
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/app.js"></script>
+
+<script>
+function animateCounter(el){
+const target=parseInt(el.dataset.target);
+let current=0;
+const step=Math.max(1,Math.floor(target/60));
+const timer=setInterval(()=>{
+current+=step;
+if(current>=target){
+el.textContent=target;
+clearInterval(timer);
+}else{
+el.textContent=current;
+}
+},25);
+}
+
+const observer=new IntersectionObserver((entries)=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+document.querySelectorAll('.counter').forEach(animateCounter);
+observer.disconnect();
+}
+});
+},{threshold:0.3});
+
+document.querySelectorAll('.counter').forEach(el=>observer.observe(el));
+</script>
+
+</body>
+</html>
