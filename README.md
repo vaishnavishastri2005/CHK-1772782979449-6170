@@ -10,26 +10,25 @@ A **Real-Time Emergency Response System** with smart ambulance allocation, traff
 
 ```
 hospital/
-├── public/
-│   ├── index.html          # Main Dashboard
-│   ├── report.html         # Report Emergency
-│   ├── ambulance.html      # Ambulance Routing
-│   ├── hospital.html       # Hospital Coordination
-│   ├── impact.html         # Impact & Benefits
-│   ├── future.html         # Future AI Vision
-│   ├── css/
-│   │   └── style.css
-│   └── js/
-│       └── app.js
-└── routes/
-    ├── server.js
-    ├── db.js
-    ├── package.json
-    ├── schema.sql
-    ├── seed.sql
-    ├── emergency.js
-    ├── ambulance.js
-    └── hospital.js
+├── server.js               # Express + WebSocket server
+├── db.js                    # MySQL database connection
+├── package.json             # Dependencies
+├── schema.sql               # Database schema
+├── seed.sql                 # Seed data
+├── .env                     # Environment variables (not pushed)
+├── .gitignore
+├── README.md
+├── routes/
+│   ├── emergency.js         # Emergency API routes
+│   ├── ambulance.js         # Ambulance API routes
+│   └── hospital.js          # Hospital API routes
+└── public/
+    ├── index.html           # Main Dashboard
+    ├── report.html          # Report Emergency
+    ├── css/
+    │   └── style.css        # Stylesheet
+    └── js/
+        └── app.js           # Frontend JavaScript
 ```
 
 ---
@@ -38,12 +37,12 @@ hospital/
 
 ### 1. Setup Database
 ```sql
-source schema.sql
-source seed.sql
+source schema.sql;
+source seed.sql;
 ```
 
 ### 2. Configure Environment
-Create a `.env` file in the `routes/` folder:
+Create a `.env` file in the root folder:
 ```
 DB_HOST=localhost
 DB_USER=root
@@ -54,7 +53,6 @@ PORT=3000
 
 ### 3. Install Dependencies
 ```bash
-cd routes
 npm install
 ```
 
@@ -95,10 +93,6 @@ http://localhost:3000
 |-------|------|
 | `/` | Dashboard |
 | `/report.html` | Report Emergency |
-| `/ambulance.html` | Ambulance Routing |
-| `/hospital.html` | Hospital Coordination |
-| `/impact.html` | Impact & Benefits |
-| `/future.html` | Future AI Vision |
 
 ---
 
