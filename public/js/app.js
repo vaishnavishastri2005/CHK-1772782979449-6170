@@ -1,5 +1,5 @@
-const API_BASE = 'http://localhost:3000/api';
-const WS_URL = 'ws://localhost:3000';
+const API_BASE = 'http://localhost:4000/api';
+const WS_URL = 'ws://localhost:4000';
 let ws = null;
 let wsReconnectTimer = null;
 
@@ -25,9 +25,9 @@ function connectWebSocket() {
       try {
         const msg = JSON.parse(evt.data);
         handleWSMessage(msg);
-      } catch (e) {}
+      } catch (e) { }
     };
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function handleWSMessage(msg) {

@@ -1,17 +1,20 @@
 require('dotenv').config();
-const express   = require('express');
-const cors      = require('cors');
-const http      = require('http');
+
+const myapikey = process.env.MY_API_KEY;
+console.log("My API key is loaded!");
+const express = require('express');
+const cors = require('cors');
+const http = require('http');
 const WebSocket = require('ws');
-const path      = require('path');
+const path = require('path');
 
 const emergencyRouter = require('./routes/emergency');
 const ambulanceRouter = require('./routes/ambulance');
-const hospitalRouter  = require('./routes/hospital');
+const hospitalRouter = require('./routes/hospital');
 
-const app    = express();
+const app = express();
 const server = http.createServer(app);
-const wss    = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ server });
 
 const PORT = process.env.PORT || 3000;
 
@@ -33,8 +36,8 @@ ambulanceRouter.setBroadcast(broadcast);
 hospitalRouter.setBroadcast(broadcast);
 
 app.use('/api/emergencies', emergencyRouter);
-app.use('/api/ambulances',  ambulanceRouter);
-app.use('/api/hospitals',   hospitalRouter);
+app.use('/api/ambulances', ambulanceRouter);
+app.use('/api/hospitals', hospitalRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({

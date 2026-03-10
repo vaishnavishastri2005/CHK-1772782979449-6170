@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hospitals – ERS Emergency Response System</title>
+    <meta name="description"
+        content="View all partner hospitals, real-time bed availability, ICU status, and ER wait times for the Emergency Response System." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --red-dark: #b91c1c;
+            --red-glow: rgba(239, 68, 68, 0.35);
+            --red-dim: rgba(239, 68, 68, 0.12);
+            --red-border: rgba(239, 68, 68, 0.28);
+            --bg: #0a0a0a;
+            --card: #111111;
+            --card2: #161616;
+            --border: rgba(255, 255, 255, 0.07);
+            --text: #f5f5f5;
+            --muted: #6b7280;
+            --sub: #9ca3af;
+            --green: #22c55e;
+            --green-dim: rgba(34, 197, 94, 0.12);
+            --green-border: rgba(34, 197, 94, 0.28);
+            --orange: #f97316;
+            --blue: #3b82f6;
+            --blue-dim: rgba(59, 130, 246, 0.12);
+            --transition: all .25s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 15% 10%, rgba(239, 68, 68, .06), transparent),
+                radial-gradient(ellipse 55% 45% at 85% 85%, rgba(34, 197, 94, .04), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--red-border);
+            border-radius: 3px;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            background: rgba(10, 10, 10, 0.88);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: .03em;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--red);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 0 16px var(--red-glow);
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            padding: 7px 14px;
+            color: var(--sub);
+            font-size: .875rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            background: var(--red-dim);
+            color: var(--text);
+        }
+
+        .nav-links a.active {
+            color: var(--red);
+            background: var(--red-dim);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: .8rem;
+            color: var(--sub);
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--green);
+            animation: livePulse 1.8s ease infinite;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, .6);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .btn-report {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            background: var(--red);
+            color: #fff;
+            font-size: .85rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px var(--red-glow);
+        }
+
+        .btn-report:hover {
+            background: var(--red-dark);
+            transform: translateY(-1px);
+        }
+
+        /* ── Layout ── */
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            padding-top: 66px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 0 1.75rem;
+        }
+
+        /* ── Page Header ── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 0 2.5rem;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 16px;
+            background: var(--green-dim);
+            border: 1px solid var(--green-border);
+            border-radius: 30px;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            color: var(--green);
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .page-header h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: clamp(2rem, 4vw, 2.9rem);
+            margin-bottom: .6rem;
+        }
+
+        .page-header p {
+            color: var(--sub);
+            font-size: .95rem;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, .06), transparent 65%);
+            opacity: 0;
+            transition: opacity .3s ease;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--red-border);
+            box-shadow: 0 8px 32px rgba(239, 68, 68, .13);
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+
+        .card-label {
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 1.2rem;
+        }
+
+        /* ── Badges ── */
+        .badge-green {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            background: var(--green-dim);
+            border: 1px solid var(--green-border);
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            color: var(--green);
+            text-transform: uppercase;
+        }
+
+        .badge-red {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            background: var(--red-dim);
+            border: 1px solid var(--red-border);
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+        }
+
+        .badge-orange {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            background: rgba(249, 115, 22, .12);
+            border: 1px solid rgba(249, 115, 22, .28);
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+        }
+
+        /* ── Summary Stats Row ── */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+        .summary-card:hover {
+            border-color: var(--red-border);
+            box-shadow: 0 4px 20px rgba(239, 68, 68, .1);
+        }
+
+        .summary-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .summary-icon.green {
+            background: var(--green-dim);
+        }
+
+        .summary-icon.red {
+            background: var(--red-dim);
+        }
+
+        .summary-icon.blue {
+            background: var(--blue-dim);
+        }
+
+        .summary-icon.orange {
+            background: rgba(249, 115, 22, .12);
+        }
+
+        .summary-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .summary-label {
+            font-size: .75rem;
+            color: var(--sub);
+            margin-top: .15rem;
+        }
+
+        /* ── Dispatched Hospital Highlight ── */
+        .dispatched-card {
+            margin-bottom: 2rem;
+            border-color: var(--green-border);
+            box-shadow: 0 0 0 1px rgba(34, 197, 94, .1), 0 8px 32px rgba(34, 197, 94, .08);
+            animation: greenPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes greenPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 1px rgba(34, 197, 94, .1), 0 8px 32px rgba(34, 197, 94, .08);
+            }
+
+            50% {
+                box-shadow: 0 0 0 1px rgba(34, 197, 94, .25), 0 8px 40px rgba(34, 197, 94, .18);
+            }
+        }
+
+        .dispatched-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .75rem;
+            margin-bottom: 1rem;
+        }
+
+        .dispatched-title-group {}
+
+        .dispatched-subtitle {
+            font-size: .78rem;
+            color: var(--sub);
+            margin-top: .25rem;
+        }
+
+        .hospital-name-lg {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .hospital-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .hospital-meta span {
+            font-size: .85rem;
+            color: var(--sub);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hosp-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin-bottom: 1.25rem;
+        }
+
+        .hosp-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hosp-stat-item {
+            text-align: center;
+        }
+
+        .hosp-stat-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .hosp-stat-value.green {
+            color: var(--green);
+        }
+
+        .hosp-stat-value.orange {
+            color: var(--orange);
+        }
+
+        .hosp-stat-label {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--muted);
+            font-weight: 600;
+            margin-top: .3rem;
+        }
+
+        /* ── Hospital Directory ── */
+        .section-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .hospital-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .hospital-row {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hospital-row::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 0% 50%, rgba(239, 68, 68, .05), transparent 60%);
+            opacity: 0;
+            transition: opacity .3s;
+            pointer-events: none;
+        }
+
+        .hospital-row:hover {
+            transform: translateY(-2px);
+            border-color: var(--red-border);
+            box-shadow: 0 6px 24px rgba(239, 68, 68, .1);
+        }
+
+        .hospital-row:hover::after {
+            opacity: 1;
+        }
+
+        .hosp-row-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .hosp-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--red-dim);
+            border: 1px solid var(--red-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .hosp-row-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .hosp-row-addr {
+            font-size: .8rem;
+            color: var(--sub);
+            margin-top: .15rem;
+        }
+
+        .hosp-row-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hosp-row-stat {
+            text-align: center;
+        }
+
+        .hosp-row-stat-val {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .hosp-row-stat-val.green {
+            color: var(--green);
+        }
+
+        .hosp-row-stat-val.orange {
+            color: var(--orange);
+        }
+
+        .hosp-row-stat-val.red {
+            color: var(--red);
+        }
+
+        .hosp-row-stat-label {
+            font-size: .65rem;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--muted);
+            margin-top: .15rem;
+        }
+
+        /* ── Footer ── */
+        .page-footer {
+            border-top: 1px solid var(--border);
+            padding: 1.25rem 0;
+            margin-top: .5rem;
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .75rem;
+        }
+
+        .footer-left {
+            font-size: .8rem;
+            color: var(--muted);
+        }
+
+        .footer-right {
+            font-size: .83rem;
+            color: var(--sub);
+        }
+
+        .footer-right .hotline {
+            color: var(--red);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hosp-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hosp-row-stats {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .summary-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 1.7rem;
+            }
+
+            .hospital-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hosp-row-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══ NAVBAR ═══ -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">🚑</div>
+            <span>ERS System</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="report.html">Report Emergency</a></li>
+            <li><a href="ambulance.html">Ambulance Routing</a></li>
+            <li><a href="hospital.html" class="active">Hospitals</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span>Live</span>
+            </div>
+            <a href="report.html" class="btn-report">🚨 Report Emergency</a>
+        </div>
+    </nav>
+
+    <!-- ═══ PAGE ═══ -->
+    <div class="page-wrapper">
+        <div class="container">
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-badge">🏥 Live Hospital Network</div>
+                <h1>Partner Hospital Directory</h1>
+                <p>Real-time bed availability, ICU status, and ER wait times across all network hospitals</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-icon green">🏥</div>
+                    <div>
+                        <div class="summary-value" id="total-hospitals">3</div>
+                        <div class="summary-label">Total Hospitals</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon green">🛏</div>
+                    <div>
+                        <div class="summary-value" id="total-beds">65</div>
+                        <div class="summary-label">Available Beds</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon blue">🧊</div>
+                    <div>
+                        <div class="summary-value" id="total-icu">11</div>
+                        <div class="summary-label">ICU Units Free</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon orange">⚡</div>
+                    <div>
+                        <div class="summary-value" id="accepting-count">3</div>
+                        <div class="summary-label">Accepting Patients</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ DISPATCHED / DESTINATION HOSPITAL (from Ambulance Routing) ══ -->
+            <div class="card dispatched-card" id="dispatched-hospital">
+                <div class="card-label">📍 Current Dispatch Destination</div>
+
+                <div class="dispatched-header">
+                    <div class="dispatched-title-group">
+                        <div class="hospital-name-lg">City General Hospital</div>
+                        <div class="dispatched-subtitle">Assigned destination for active emergency · AMB-001 en route
+                        </div>
+                    </div>
+                    <span class="badge-green">✔ Accepting Patients</span>
+                </div>
+
+                <div class="hospital-meta">
+                    <span>📍 12 MG Road, Pune, Maharashtra</span>
+                    <span>📞 +91-20-1234-5678</span>
+                    <span>🏷 Multi-Specialty</span>
+                </div>
+
+                <hr class="hosp-divider" />
+
+                <div class="hosp-stats">
+                    <div class="hosp-stat-item">
+                        <div class="hosp-stat-value green">45</div>
+                        <div class="hosp-stat-label">Available Beds</div>
+                    </div>
+                    <div class="hosp-stat-item">
+                        <div class="hosp-stat-value">3</div>
+                        <div class="hosp-stat-label">ICU Available</div>
+                    </div>
+                    <div class="hosp-stat-item">
+                        <div class="hosp-stat-value orange">8 min</div>
+                        <div class="hosp-stat-label">ER Wait Time</div>
+                    </div>
+                    <div class="hosp-stat-item">
+                        <div class="hosp-stat-value" style="font-size:1.4rem;">Multi</div>
+                        <div class="hosp-stat-label">Hospital Type</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ FULL HOSPITAL DIRECTORY ══ -->
+            <div class="section-title">🏥 All Network Hospitals</div>
+
+            <div class="hospital-list" id="hospital-list">
+
+                <!-- Hospital 1 -->
+                <div class="hospital-row">
+                    <div class="hosp-row-left">
+                        <div class="hosp-icon">🏥</div>
+                        <div>
+                            <div class="hosp-row-name">City General Hospital</div>
+                            <div class="hosp-row-addr">📍 12 MG Road, Pune · 📞 +91-20-1234-5678</div>
+                        </div>
+                    </div>
+                    <div class="hosp-row-stats">
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val green">45</div>
+                            <div class="hosp-row-stat-label">Beds Free</div>
+                        </div>
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val">3</div>
+                            <div class="hosp-row-stat-label">ICU</div>
+                        </div>
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val orange">8 min</div>
+                            <div class="hosp-row-stat-label">ER Wait</div>
+                        </div>
+                        <span class="badge-green">✔ Accepting</span>
+                    </div>
+                </div>
+
+                <!-- Hospital 2 -->
+                <div class="hospital-row">
+                    <div class="hosp-row-left">
+                        <div class="hosp-icon">🏥</div>
+                        <div>
+                            <div class="hosp-row-name">Apollo Emergency Center</div>
+                            <div class="hosp-row-addr">📍 Baner Road, Pune · 📞 +91-20-9876-5432</div>
+                        </div>
+                    </div>
+                    <div class="hosp-row-stats">
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val green">12</div>
+                            <div class="hosp-row-stat-label">Beds Free</div>
+                        </div>
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val">5</div>
+                            <div class="hosp-row-stat-label">ICU</div>
+                        </div>
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val green">3 min</div>
+                            <div class="hosp-row-stat-label">ER Wait</div>
+                        </div>
+                        <span class="badge-green">✔ Accepting</span>
+                    </div>
+                </div>
+
+                <!-- Hospital 3 -->
+                <div class="hospital-row">
+                    <div class="hosp-row-left">
+                        <div class="hosp-icon">🏥</div>
+                        <div>
+                            <div class="hosp-row-name">Medanta Trauma Center</div>
+                            <div class="hosp-row-addr">📍 Hadapsar, Pune · 📞 +91-20-1111-2222</div>
+                        </div>
+                    </div>
+                    <div class="hosp-row-stats">
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val orange">8</div>
+                            <div class="hosp-row-stat-label">Beds Free</div>
+                        </div>
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val">3</div>
+                            <div class="hosp-row-stat-label">ICU</div>
+                        </div>
+                        <div class="hosp-row-stat">
+                            <div class="hosp-row-stat-val red">18 min</div>
+                            <div class="hosp-row-stat-label">ER Wait</div>
+                        </div>
+                        <span class="badge-orange">⚠ Limited</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Page Footer -->
+            <footer class="page-footer">
+                <div class="footer-inner">
+                    <div class="footer-left">
+                        🔄 Hospital data refreshes every 60 seconds · Last sync: <strong
+                            style="color:var(--green);">Live</strong>
+                    </div>
+                    <div class="footer-right">
+                        Emergency helpline: 📞 <span class="hotline">108</span>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <script>
+        // Fetch live hospital data from API and update the directory
+        async function loadHospitals() {
+            try {
+                const API_BASE = window.location.origin + '/api';
+                const res = await fetch(`${API_BASE}/hospitals`);
+                const json = await res.json();
+                if (!json.success || !json.data) return;
+
+                const hospitals = json.data;
+
+                // Update summary counters
+                const totalBeds = hospitals.reduce((s, h) => s + (h.available_beds || 0), 0);
+                const accepting = hospitals.filter(h => !h.on_alert).length;
+
+                document.getElementById('total-hospitals').textContent = hospitals.length;
+                document.getElementById('total-beds').textContent = totalBeds;
+                document.getElementById('accepting-count').textContent = accepting;
+
+            } catch (e) {
+                // silently fail — static fallback data already shown
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadHospitals);
+    </script>
+
+</body>
+
+</html>

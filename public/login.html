@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login – RAKSHAK Emergency Response System</title>
+    <meta name="description"
+        content="Sign in to RAKSHAK Emergency Response System to manage ambulance dispatch, hospital coordination, and emergency reporting." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ff3b3b;
+            --red-dark: #cc1f1f;
+            --red-glow: rgba(255, 59, 59, 0.35);
+            --red-dim: rgba(255, 59, 59, 0.1);
+            --red-border: rgba(255, 59, 59, 0.3);
+            --bg: #0a0a0a;
+            --card: #111111;
+            --card2: #181818;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f0f4ff;
+            --muted: #6b7a99;
+            --sub: #9ba8c0;
+            --green: #22c55e;
+            --transition: all .25s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* ── Animated background ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255, 59, 59, .09), transparent),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(255, 59, 59, .05), transparent),
+                radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255, 59, 59, .03), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--red-border);
+            border-radius: 3px;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(16px);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: .03em;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--red);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 0 16px var(--red-glow);
+        }
+
+        .nav-badge {
+            font-size: .75rem;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* ── Main layout ── */
+        .page-body {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* ── Header ── */
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--red-dim);
+            border: 2px solid var(--red-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1.25rem;
+            animation: iconPulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 59, 59, .4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(255, 59, 59, 0);
+            }
+        }
+
+        .login-header h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: .35rem;
+            letter-spacing: .01em;
+        }
+
+        .login-header h1 span {
+            color: var(--red);
+        }
+
+        .login-header p {
+            font-size: .88rem;
+            color: var(--muted);
+        }
+
+        /* ── Card ── */
+        .login-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--red), #ff6b6b, var(--red));
+            background-size: 200%;
+            animation: shimmer 2.5s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% center;
+            }
+
+            100% {
+                background-position: -200% center;
+            }
+        }
+
+        /* ── Form Fields ── */
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--sub);
+            margin-bottom: .45rem;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            pointer-events: none;
+            opacity: .6;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: .9rem;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: var(--muted);
+        }
+
+        .form-control:focus {
+            border-color: var(--red-border);
+            background: rgba(255, 59, 59, 0.05);
+            box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.1);
+        }
+
+        /* Password row */
+        .password-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: .45rem;
+        }
+
+        .forgot-link {
+            font-size: .75rem;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color .2s ease;
+            font-weight: 500;
+        }
+
+        .forgot-link:hover {
+            color: var(--red);
+            text-decoration: underline;
+        }
+
+        /* Show/hide toggle */
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: .85rem;
+            padding: 4px;
+            transition: color .2s;
+        }
+
+        .toggle-pw:hover {
+            color: var(--text);
+        }
+
+        /* ── Remember me ── */
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: 1.4rem;
+            margin-top: .25rem;
+        }
+
+        .remember-row input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            accent-color: var(--red);
+            cursor: pointer;
+        }
+
+        .remember-row label {
+            font-size: .82rem;
+            color: var(--sub);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* ── Login Button ── */
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(255, 59, 59, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: .02em;
+            margin-bottom: 1.25rem;
+        }
+
+        .btn-login:hover {
+            background: var(--red-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(255, 59, 59, 0.45);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* ── Divider ── */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider-text {
+            font-size: .75rem;
+            color: var(--muted);
+            white-space: nowrap;
+            font-weight: 500;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+
+        /* ── Google Button ── */
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: var(--card2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-google:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .btn-google:active {
+            transform: translateY(0);
+        }
+
+        .google-logo {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* ── Footer link ── */
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: .83rem;
+            color: var(--muted);
+        }
+
+        .login-footer a {
+            color: var(--red);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity .2s;
+        }
+
+        .login-footer a:hover {
+            opacity: .8;
+            text-decoration: underline;
+        }
+
+        /* ── Error / Success message ── */
+        .form-msg {
+            display: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: .82rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-msg.error {
+            display: flex;
+            background: rgba(255, 59, 59, 0.1);
+            border: 1px solid rgba(255, 59, 59, 0.3);
+            color: #ff7070;
+        }
+
+        .form-msg.success {
+            display: flex;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--green);
+        }
+
+        /* ── Spinner ── */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .65s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Bottom note ── */
+        .page-note {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 1.25rem;
+            font-size: .75rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
+
+            .login-header h1 {
+                font-size: 1.7rem;
+            }
+
+            .navbar {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── Navbar ── -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">🚑</div>
+            <span>RAKSHAK</span>
+        </a>
+        <span class="nav-badge">🔒 Secure Login</span>
+    </nav>
+
+    <!-- ── Main ── -->
+    <div class="page-body">
+        <div class="login-wrapper">
+
+            <!-- Header -->
+            <div class="login-header">
+                <div class="login-icon">🚨</div>
+                <h1>Welcome to <span>RAKSHAK</span></h1>
+                <p>Sign in to access the RAKSHAK Emergency Response System</p>
+            </div>
+
+            <!-- Card -->
+            <div class="login-card">
+
+                <!-- Error/Success Message -->
+                <div class="form-msg" id="form-msg">
+                    <span id="form-msg-icon">⚠️</span>
+                    <span id="form-msg-text"></span>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" novalidate>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">✉️</span>
+                            <input id="email" type="email" class="form-control" placeholder="you@example.com"
+                                autocomplete="email" required />
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <div class="password-row">
+                            <label class="form-label" for="password" style="margin-bottom:0;">Password</label>
+                            <a href="forgot-password.html" class="forgot-link" id="forgot-link">Forgot password?</a>
+                        </div>
+                        <div class="input-wrap">
+                            <span class="input-icon">🔑</span>
+                            <input id="password" type="password" class="form-control" placeholder="Enter your password"
+                                autocomplete="current-password" required />
+                            <button type="button" class="toggle-pw" id="toggle-pw"
+                                aria-label="Toggle password visibility">
+                                👁
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="remember-row">
+                        <input type="checkbox" id="remember" name="remember" />
+                        <label for="remember">Keep me signed in</label>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn-login" id="login-btn">
+                        🔐 Sign In
+                    </button>
+
+                </form>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">or continue with</span>
+                    <div class="divider-line"></div>
+                </div>
+
+                <!-- Google Login -->
+                <a href="#" class="btn-google" id="google-btn" onclick="handleGoogleLogin(event)">
+                    <!-- Google SVG logo -->
+                    <svg class="google-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            fill="#4285F4" />
+                        <path
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            fill="#34A853" />
+                        <path
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                            fill="#FBBC05" />
+                        <path
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            fill="#EA4335" />
+                    </svg>
+                    Sign in with Google
+                </a>
+
+            </div>
+
+            <!-- Sign up link -->
+            <div class="login-footer">
+                Don't have an account? &nbsp;<a href="register.html">Create one →</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bottom note -->
+    <div class="page-note">
+        🔒 Secured with end-to-end encryption &nbsp;·&nbsp; RAKSHAK Emergency Response System &nbsp;·&nbsp; Emergency:
+        <strong style="color:var(--red);">108</strong>
+    </div>
+
+    <script>
+        // ── Toggle password visibility ──
+        const pwInput = document.getElementById('password');
+        const togglePw = document.getElementById('toggle-pw');
+
+        togglePw.addEventListener('click', () => {
+            const isHidden = pwInput.type === 'password';
+            pwInput.type = isHidden ? 'text' : 'password';
+            togglePw.textContent = isHidden ? '🙈' : '👁';
+        });
+
+        // ── Show form message ──
+        function showMsg(type, text) {
+            const box = document.getElementById('form-msg');
+            const icon = document.getElementById('form-msg-icon');
+            const msg = document.getElementById('form-msg-text');
+
+            box.className = `form-msg ${type}`;
+            icon.textContent = type === 'error' ? '⚠️' : '✅';
+            msg.textContent = text;
+        }
+
+        function hideMsg() {
+            document.getElementById('form-msg').className = 'form-msg';
+        }
+
+        // ── Form submit ──
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMsg();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('login-btn');
+
+            // Basic validation
+            if (!email || !password) {
+                showMsg('error', 'Please enter your email and password.');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showMsg('error', 'Please enter a valid email address.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMsg('error', 'Password must be at least 6 characters.');
+                return;
+            }
+
+            // Loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Signing in…';
+
+            // Simulate API call (replace with real auth endpoint)
+            await new Promise(r => setTimeout(r, 1500));
+
+            // Demo: any credentials work → redirect to dashboard
+            // In production: replace with real API call to /api/auth/login
+            showMsg('success', 'Login successful! Redirecting to dashboard…');
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1200);
+
+            btn.disabled = false;
+            btn.innerHTML = '🔐 Sign In';
+        });
+
+        // ── Google Login ──
+        function handleGoogleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('google-btn');
+            btn.innerHTML = `
+      <span class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:#fff;"></span>
+      Connecting to Google…
+    `;
+            btn.style.pointerEvents = 'none';
+
+            // Simulate redirect (replace with real Google OAuth URL)
+            setTimeout(() => {
+                showMsg('success', 'Redirecting to Google Sign-In…');
+                // window.location.href = '/auth/google'; // ← your real OAuth route
+                setTimeout(() => {
+                    btn.innerHTML = `
+          <svg class="google-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        `;
+                    btn.style.pointerEvents = 'auto';
+                }, 2000);
+            }, 800);
+        }
+
+        // ── Clear error on typing ──
+        document.getElementById('email').addEventListener('input', hideMsg);
+        document.getElementById('password').addEventListener('input', hideMsg);
+    </script>
+
+</body>
+
+</html>

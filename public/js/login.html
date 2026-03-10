@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login – RAKSHAK Emergency Response System</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ff3b3b;
+            --red-dark: #cc1f1f;
+            --red-glow: rgba(255, 59, 59, 0.35);
+            --red-dim: rgba(255, 59, 59, 0.1);
+            --red-border: rgba(255, 59, 59, 0.3);
+            --bg: #0a0a0a;
+            --card: #111111;
+            --card2: #181818;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f0f4ff;
+            --muted: #6b7a99;
+            --sub: #9ba8c0;
+            --green: #22c55e;
+            --transition: all .25s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255, 59, 59, .09), transparent),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(255, 59, 59, .05), transparent),
+                radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255, 59, 59, .03), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .navbar {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(16px);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--red);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 16px var(--red-glow);
+        }
+
+        .page-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--red-dim);
+            border: 2px solid var(--red-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1.25rem;
+            animation: iconPulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 59, 59, .4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(255, 59, 59, 0);
+            }
+        }
+
+        .login-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--red), #ff6b6b, var(--red));
+            background-size: 200%;
+            animation: shimmer 2.5s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% center;
+            }
+
+            100% {
+                background-position: -200% center;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+            font-size: .9rem;
+            outline: none;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .page-note {
+            text-align: center;
+            padding: 1.25rem;
+            font-size: .75rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="/index.html" class="nav-logo">
+            <div class="logo-icon">🚑</div>
+            <span>RAKSHAK</span>
+        </a>
+    </nav>
+
+    <div class="page-body">
+
+        <div class="login-wrapper">
+
+            <div class="login-header">
+                <div class="login-icon">🚨</div>
+                <h1>Welcome to <span style="color:#ff3b3b;">RAKSHAK</span></h1>
+                <p>Sign in to access the system</p>
+            </div>
+
+            <div class="login-card">
+
+                <div class="form-msg" id="form-msg">
+                    <span id="form-msg-icon">⚠️</span>
+                    <span id="form-msg-text"></span>
+                </div>
+
+                <form id="login-form">
+
+                    <div class="form-group">
+                        <input id="email" type="email" class="form-control" placeholder="Email" />
+                    </div>
+
+                    <div class="form-group">
+                        <input id="password" type="password" class="form-control" placeholder="Password" />
+                    </div>
+
+                    <button type="submit" class="btn-login" id="login-btn">
+                        Sign In
+                    </button>
+
+                </form>
+
+                <div class="divider"></div>
+
+                <a href="#" class="btn-google" id="google-btn" onclick="handleGoogleLogin(event)">
+                    Sign in with Google
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="page-note">
+        Emergency: <strong style="color:#ff3b3b;">108</strong>
+    </div>
+
+    <script>
+
+        const pwInput = document.getElementById('password');
+        const togglePw = document.getElementById('toggle-pw');
+
+        function showMsg(type, text) {
+            const box = document.getElementById('form-msg');
+            const icon = document.getElementById('form-msg-icon');
+            const msg = document.getElementById('form-msg-text');
+
+            box.className = `form-msg ${type}`;
+            icon.textContent = type === 'error' ? '⚠️' : '✅';
+            msg.textContent = text;
+        }
+
+        function hideMsg() {
+            document.getElementById('form-msg').className = 'form-msg';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+
+            e.preventDefault();
+            hideMsg();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('login-btn');
+
+            if (!email || !password) {
+                showMsg('error', 'Enter email and password');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Signing in...';
+
+            await new Promise(r => setTimeout(r, 1500));
+
+            showMsg('success', 'Login successful');
+
+            setTimeout(() => {
+                window.location.href = '/index.html';
+            }, 1200);
+
+            btn.disabled = false;
+            btn.innerHTML = 'Sign In';
+
+        });
+
+        function handleGoogleLogin(e) {
+
+            e.preventDefault();
+
+            const btn = document.getElementById('google-btn');
+
+            btn.innerHTML = 'Connecting...';
+
+            setTimeout(() => {
+                showMsg('success', 'Redirecting to Google...');
+            }, 2000);
+
+        }
+
+    </script>
+
+</body>
+
+</html>

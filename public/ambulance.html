@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ambulance Routing – ERS Emergency Response System</title>
+    <meta name="description"
+        content="Live ambulance routing and real-time tracking for your emergency. See ETA, driver details, and destination hospital." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ── Reset & Root ─────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: #ef4444;
+            --red-dark: #b91c1c;
+            --red-glow: rgba(239, 68, 68, 0.35);
+            --red-dim: rgba(239, 68, 68, 0.12);
+            --red-border: rgba(239, 68, 68, 0.28);
+            --bg: #0a0a0a;
+            --card: #111111;
+            --card2: #161616;
+            --border: rgba(255, 255, 255, 0.07);
+            --text: #f5f5f5;
+            --muted: #6b7280;
+            --sub: #9ca3af;
+            --green: #22c55e;
+            --orange: #f97316;
+            --transition: all .25s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Global BG orbs */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 15% 10%, rgba(239, 68, 68, .07), transparent),
+                radial-gradient(ellipse 55% 45% at 85% 85%, rgba(239, 68, 68, .04), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--red-border);
+            border-radius: 3px;
+        }
+
+        /* ── Navbar ───────────────────────────────────────────── */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            background: rgba(10, 10, 10, 0.88);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: .03em;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--red);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 0 16px var(--red-glow);
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            padding: 7px 14px;
+            color: var(--sub);
+            font-size: .875rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            background: var(--red-dim);
+            color: var(--text);
+        }
+
+        .nav-links a.active {
+            color: var(--red);
+            background: var(--red-dim);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Live dot */
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: .8rem;
+            color: var(--sub);
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            background: var(--green);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 8px var(--green);
+            animation: livePulse 1.8s ease infinite;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, .6);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .btn-report {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            background: var(--red);
+            color: #fff;
+            font-size: .85rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px var(--red-glow);
+        }
+
+        .btn-report:hover {
+            background: var(--red-dark);
+            transform: translateY(-1px);
+        }
+
+        /* ── Layout ───────────────────────────────────────────── */
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            padding-top: 66px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 0 1.75rem;
+        }
+
+        /* ── Page Header ─────────────────────────────────────── */
+        .page-header {
+            text-align: center;
+            padding: 3.5rem 0 2.5rem;
+        }
+
+        .enroute-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 16px;
+            background: var(--red-dim);
+            border: 1px solid var(--red-border);
+            border-radius: 30px;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            color: var(--red);
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .enroute-badge .blink-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--red);
+            border-radius: 50%;
+            animation: blinkDot .9s step-start infinite;
+        }
+
+        @keyframes blinkDot {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .page-header h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: clamp(2rem, 4vw, 2.9rem);
+            margin-bottom: .6rem;
+            letter-spacing: .01em;
+        }
+
+        .page-header p {
+            color: var(--sub);
+            font-size: .95rem;
+            font-weight: 400;
+        }
+
+        /* ── Cards ───────────────────────────────────────────── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, .07), transparent 65%);
+            opacity: 0;
+            transition: opacity .3s ease;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--red-border);
+            box-shadow: 0 8px 32px rgba(239, 68, 68, .15);
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+
+        .card-label {
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 1.2rem;
+        }
+
+        /* ── ETA Card ────────────────────────────────────────── */
+        .eta-card {
+            margin-bottom: 1.75rem;
+            animation: etaPulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes etaPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+                border-color: rgba(239, 68, 68, .25);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0), 0 0 28px rgba(239, 68, 68, .3);
+                border-color: rgba(239, 68, 68, .55);
+            }
+        }
+
+        .eta-body {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .eta-number {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(4.5rem, 9vw, 6.5rem);
+            font-weight: 700;
+            color: var(--red);
+            line-height: 1;
+            text-shadow: 0 0 40px rgba(239, 68, 68, .45);
+        }
+
+        .eta-text-col .eta-unit {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            display: block;
+        }
+
+        .eta-text-col .eta-sub {
+            color: var(--sub);
+            font-size: .88rem;
+            margin-top: .2rem;
+        }
+
+        .eta-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin-bottom: 1.25rem;
+        }
+
+        .eta-stats {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .eta-stat {
+            flex: 1;
+            min-width: 120px;
+            padding: 0 1.5rem;
+            border-right: 1px solid var(--border);
+        }
+
+        .eta-stat:first-child {
+            padding-left: 0;
+        }
+
+        .eta-stat:last-child {
+            border-right: none;
+        }
+
+        .eta-stat-label {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: .25rem;
+        }
+
+        .eta-stat-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .eta-stat-value.orange {
+            color: var(--orange);
+        }
+
+        .eta-stat-value.red {
+            color: var(--red);
+        }
+
+        /* EN ROUTE inline badge */
+        .badge-enroute {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            background: var(--red-dim);
+            border: 1px solid var(--red-border);
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            color: var(--red);
+            text-transform: uppercase;
+        }
+
+        .badge-enroute .bd {
+            animation: blinkDot .9s step-start infinite;
+        }
+
+        /* Green badge */
+        .badge-green {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            background: rgba(34, 197, 94, .12);
+            border: 1px solid rgba(34, 197, 94, .28);
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            color: var(--green);
+            text-transform: uppercase;
+        }
+
+        /* Red pill */
+        .badge-red-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            background: var(--red-dim);
+            border: 1px solid var(--red-border);
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        /* ── Two-col grid ────────────────────────────────────── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.75rem;
+            margin-bottom: 1.75rem;
+        }
+
+        /* ── Driver Card ─────────────────────────────────────── */
+        .driver-avatar {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, .35);
+            flex-shrink: 0;
+        }
+
+        .driver-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: .25rem;
+        }
+
+        .driver-exp {
+            font-size: .85rem;
+            color: var(--sub);
+            margin-bottom: .75rem;
+        }
+
+        .btn-call {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background: var(--red-dim);
+            border: 1px solid var(--red-border);
+            border-radius: 10px;
+            color: var(--red);
+            font-size: .9rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1.25rem;
+        }
+
+        .btn-call:hover {
+            background: rgba(239, 68, 68, .22);
+            box-shadow: 0 4px 16px rgba(239, 68, 68, .2);
+        }
+
+        /* ── Ambulance Details Card ───────────────────────────── */
+        .amb-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+
+        .amb-info-label {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: .2rem;
+        }
+
+        .amb-info-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .equip-label {
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: .6rem;
+        }
+
+        .equip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .equip-pill {
+            padding: 4px 12px;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 500;
+            color: var(--sub);
+            transition: var(--transition);
+        }
+
+        .equip-pill:hover {
+            border-color: var(--red-border);
+            color: var(--text);
+        }
+
+
+
+        /* ── Footer ──────────────────────────────────────────── */
+        .page-footer {
+            border-top: 1px solid var(--border);
+            padding: 1.25rem 0;
+            margin-top: .5rem;
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .75rem;
+        }
+
+        .footer-left {
+            font-size: .8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-right {
+            font-size: .83rem;
+            color: var(--sub);
+        }
+
+        .footer-right .hotline {
+            color: var(--red);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* ── Responsive ──────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .eta-stats {
+                flex-direction: column;
+                gap: .75rem;
+            }
+
+            .eta-stat {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 0 0 .75rem;
+            }
+
+            .eta-stat:last-child {
+                border-bottom: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header h1 {
+                font-size: 1.7rem;
+            }
+
+            .eta-number {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════════ NAVBAR ═══════════ -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">🚑</div>
+            <span>ERS System</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="report.html">Report Emergency</a></li>
+            <li><a href="ambulance.html" class="active">Ambulance Routing</a></li>
+            <li><a href="hospital.html">Hospitals</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span>Live</span>
+            </div>
+            <a href="report.html" class="btn-report">🚨 Report Emergency</a>
+        </div>
+    </nav>
+
+    <!-- ═══════════ PAGE CONTENT ═══════════ -->
+    <div class="page-wrapper">
+        <div class="container">
+
+            <!-- ── Page Header ── -->
+            <div class="page-header">
+                <div class="enroute-badge">
+                    <span class="blink-dot"></span>
+                    EN ROUTE — LIVE TRACKING
+                </div>
+                <h1>Your Ambulance Is On The Way</h1>
+                <p>Live status of the ambulance assigned to your emergency</p>
+            </div>
+
+            <!-- ══ SECTION 1: ETA CARD ══ -->
+            <div class="card eta-card">
+                <div class="card-label">⏱ Estimated Arrival</div>
+
+                <div class="eta-body">
+                    <div class="eta-number">6</div>
+                    <div class="eta-text-col">
+                        <span class="eta-unit">Minutes Away</span>
+                        <span class="eta-sub">Ambulance AMB-001 is heading to you</span>
+                    </div>
+                </div>
+
+                <hr class="eta-divider" />
+
+                <div class="eta-stats">
+                    <div class="eta-stat">
+                        <div class="eta-stat-label">Distance</div>
+                        <div class="eta-stat-value">3.2 km</div>
+                    </div>
+                    <div class="eta-stat">
+                        <div class="eta-stat-label">Traffic</div>
+                        <div class="eta-stat-value orange">Moderate</div>
+                    </div>
+                    <div class="eta-stat">
+                        <div class="eta-stat-label">Unit Type</div>
+                        <div class="eta-stat-value">ALS</div>
+                    </div>
+                    <div class="eta-stat">
+                        <div class="eta-stat-label">Status</div>
+                        <div class="eta-stat-value">
+                            <span class="badge-enroute">
+                                <span class="bd"
+                                    style="display:inline-block;width:7px;height:7px;background:var(--red);border-radius:50%;"></span>
+                                EN ROUTE
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ SECTION 2: TWO CARDS ══ -->
+            <div class="two-col">
+
+                <!-- Driver Card -->
+                <div class="card">
+                    <div class="card-label">👤 Driver Details</div>
+
+                    <div class="driver-avatar">RK</div>
+
+                    <div class="driver-name">Rajesh Kumar</div>
+                    <div class="driver-exp">8 Years Experience</div>
+                    <span class="badge-red-pill">✔ ALS Certified</span>
+
+                    <a href="tel:+919800111111" class="btn-call">
+                        📞 Call Driver &nbsp; +91-98001-11111
+                    </a>
+                </div>
+
+                <!-- Ambulance Details Card -->
+                <div class="card">
+                    <div class="card-label">🚑 Ambulance Details</div>
+
+                    <div class="amb-grid">
+                        <div class="amb-info-item">
+                            <div class="amb-info-label">Unit ID</div>
+                            <div class="amb-info-value">AMB-001</div>
+                        </div>
+                        <div class="amb-info-item">
+                            <div class="amb-info-label">License Plate</div>
+                            <div class="amb-info-value">MH-12-AB-1234</div>
+                        </div>
+                        <div class="amb-info-item">
+                            <div class="amb-info-label">Vehicle Type</div>
+                            <div class="amb-info-value">ALS</div>
+                        </div>
+                        <div class="amb-info-item">
+                            <div class="amb-info-label">Support Level</div>
+                            <div class="amb-info-value">Advanced</div>
+                        </div>
+                    </div>
+
+                    <div class="equip-label">Equipment On Board</div>
+                    <div class="equip-row">
+                        <span class="equip-pill">Defibrillator</span>
+                        <span class="equip-pill">Oxygen Tank</span>
+                        <span class="equip-pill">Stretcher</span>
+                        <span class="equip-pill">IV Kit</span>
+                        <span class="equip-pill">ECG Monitor</span>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ══ PAGE FOOTER ══ -->
+            <footer class="page-footer">
+                <div class="footer-inner">
+                    <div class="footer-left">
+                        🔄 Location updates every 30 seconds &nbsp;·&nbsp; Last sync: <strong
+                            style="color:var(--green);">Live</strong>
+                    </div>
+                    <div class="footer-right">
+                        Emergency helpline: 📞 <span class="hotline">108</span>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
