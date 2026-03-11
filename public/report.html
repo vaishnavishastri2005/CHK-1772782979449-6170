@@ -13,7 +13,7 @@
 
   <nav class="navbar">
     <a href="index.html" class="nav-logo">
-      <div class="logo-icon">🚑</div><span>ERS System</span>
+      <div class="logo-icon">🚑</div><span>RAKSHAK</span>
     </a>
     <ul class="nav-links">
       <li><a href="index.html">Dashboard</a></li>
@@ -21,11 +21,7 @@
       <li><a href="ambulance.html">Ambulance Routing</a></li>
       <li><a href="hospital.html">Hospitals</a></li>
     </ul>
-    <div class="nav-cta">
-      <div class="ws-indicator">
-        <div class="ws-dot"></div><span class="ws-status-text">Connecting…</span>
-      </div>
-    </div>
+
   </nav>
 
   <div class="page-wrapper">
@@ -122,6 +118,15 @@
 
           <div style="display:flex;flex-direction:column;gap:1.2rem;">
 
+            <div class="card" id="gps-info-card" style="text-align:center;padding:1.5rem;">
+              <div style="font-size:3rem;margin-bottom:0.8rem;">📍</div>
+              <h4 style="margin-bottom:0.4rem;">Auto GPS Detection</h4>
+              <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+                Click the GPS button to automatically detect your coordinates.
+              </p>
+              <button class="btn btn-accent btn-full" onclick="detectGPS()">📍 Detect My Location</button>
+            </div>
+
             <div class="card">
               <h3 style="font-family:'Space Grotesk',sans-serif;margin-bottom:1rem;">⚡ What happens next?</h3>
 
@@ -174,15 +179,6 @@
               <p style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted);">
                 For life-threatening emergencies select severity 4 or 5 for highest priority.
               </p>
-            </div>
-
-            <div class="card" id="gps-info-card" style="text-align:center;padding:1.5rem;">
-              <div style="font-size:3rem;margin-bottom:0.8rem;">📍</div>
-              <h4 style="margin-bottom:0.4rem;">Auto GPS Detection</h4>
-              <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
-                Click the GPS button to automatically detect your coordinates.
-              </p>
-              <button class="btn btn-accent btn-full" onclick="detectGPS()">📍 Detect My Location</button>
             </div>
 
           </div>
@@ -239,6 +235,8 @@
     document.getElementById('emergency-form').addEventListener('submit', async (e) => {
 
       e.preventDefault();
+
+      alert("we have sent the form");
 
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
@@ -301,6 +299,7 @@
     window.addEventListener('DOMContentLoaded', () => setTimeout(detectGPS, 500));
 
   </script>
+  <script type="module" src="js/auth-nav.js"></script>
 </body>
 
 </html>

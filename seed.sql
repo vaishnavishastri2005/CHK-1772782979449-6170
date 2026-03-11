@@ -14,10 +14,10 @@ INSERT INTO hospitals (name, address, latitude, longitude, phone, total_beds, av
 
 INSERT INTO ambulances (vehicle_number, driver_name, driver_phone, current_latitude, current_longitude, status) VALUES
 ('KA-01-AMB-001','Suresh Kumar','+91-9111111101',12.9716,77.5946,'available'),
-('KA-01-AMB-002','Priya Menon','+91-9111111102',12.9800,77.6100,'available'),
+('KA-01-AMB-002','Ramesh Menon','+91-9111111102',12.9800,77.6100,'available'),
 ('KA-01-AMB-003','Anil Singh','+91-9111111103',12.9500,77.5700,'en_route'),
 ('KA-01-AMB-004','Deepak Rao','+91-9111111104',13.0100,77.5900,'available'),
-('KA-01-AMB-005','Sunita Devi','+91-9111111105',12.9600,77.6300,'available');
+('KA-01-AMB-005','Sunil Sharma','+91-9111111105',12.9600,77.6300,'available');
 
 INSERT INTO emergencies (patient_name, emergency_type, severity, description, latitude, longitude, address, status, reported_by) VALUES
 ('Rajesh P','Heart Attack',5,'Patient collapsed on road, unresponsive',12.9716,77.5946,'MG Road, Bengaluru','pending',4),

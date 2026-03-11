@@ -1,0 +1,7 @@
+
+🔄  Connecting to Firebase...
+
+❌  Full error: {
+  "code": "auth/configuration-not-found",
+  "message": "There is no configuration corresponding to the provided identifier."
+}

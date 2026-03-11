@@ -1,0 +1,26 @@
+﻿git : warning: in the 
+working copy of 
+'.gitignore', LF will be 
+replaced by CRLF the next 
+time Git touches it
+At line:1 char:1
++ git add -A 2>&1 | Out-File 
+"c:\Users\vaish\OneDrive\Desk
+top\hospital\ ...
++ ~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (warning  
+  : in the... Git touches    
+ it:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+warning: in the working copy 
+of 'public/login.html', LF 
+will be replaced by CRLF the 
+next time Git touches it
+warning: in the working copy 
+of 'out4.txt', LF will be 
+replaced by CRLF the next 
+time Git touches it

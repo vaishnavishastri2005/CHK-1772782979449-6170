@@ -1,0 +1,2 @@
+﻿origin	https://github.com/vaishnavishastri2005/CHK-1772782979449-6170.git (fetch)
+origin	https://github.com/vaishnavishastri2005/CHK-1772782979449-6170.git (push)

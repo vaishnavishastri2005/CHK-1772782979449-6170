@@ -193,7 +193,7 @@
     <nav class="navbar">
         <a href="index.html" class="nav-logo">
             <div class="logo-icon">🚑</div>
-            <span>ERS System</span>
+            <span>RAKSHAK</span>
         </a>
 
         <ul class="nav-links">
@@ -205,13 +205,7 @@
             <!-- <li><a href="future.html">Future Vision</a></li> -->
         </ul>
 
-        <div class="nav-cta">
-            <div class="ws-indicator">
-                <div class="ws-dot" id="ws-dot"></div>
-                <span class="ws-status-text">Connecting…</span>
-            </div>
-            <a href="report.html" class="btn btn-primary btn-pulse">🚨 Report Emergency</a>
-        </div>
+
     </nav>
 
     <div class="page-wrapper">
@@ -288,7 +282,6 @@
                             style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
                             <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;">🔴 Live
                                 Emergency Feed</h2>
-                            <span class="badge badge-pending" id="feed-count">Loading…</span>
                         </div>
 
                         <div class="card" style="padding:0;">
@@ -409,6 +402,14 @@
                     <span class="dispatch-check">✔</span>
                 </li>
             </ul>
+
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.25rem; text-align: left; margin-bottom: 1.5rem;">
+                <div style="font-size: 0.75rem; color: #ff3b3b; margin-bottom: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Message Transmitted</div>
+                <div id="sos-transmitted-msg" style="font-size: 0.85rem; color: #d0d8f0; line-height: 1.5; font-style: italic;">
+                    "EMERGENCY SOS: Immediate assistance required..."
+                </div>
+            </div>
+
             <button class="sos-close-btn" id="sos-close-btn" onclick="closeSOSModal()">✓ OK, Got It</button>
         </div>
     </div>
@@ -430,7 +431,6 @@
 
                     document.getElementById('stat-active').textContent = active;
                     document.getElementById('stat-resolved').textContent = resolved;
-                    document.getElementById('feed-count').textContent = `${emergencies.length} total`;
 
                     renderFeed(emergencies.slice(0, 6));
 
@@ -516,6 +516,17 @@
         function openSOSModal() {
             document.getElementById('sos-overlay').classList.add('active');
             document.getElementById('sos-close-btn').focus();
+            
+            // Add a realistic timestamp to the mocked transmitted message
+            const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            const msgBox = document.getElementById('sos-transmitted-msg');
+            if (msgBox) {
+                msgBox.innerHTML = `
+                    <div style="margin-bottom: 8px;"><strong>EN:</strong> [${now}] "EMERGENCY SOS FROM RAKSHAK: Immediate assistance required! User location auto-detected via GPS. Dispatching nearest available ambulance."</div>
+                    <div style="margin-bottom: 8px; font-style: normal;"><strong>HI:</strong> [${now}] "रक्षक से आपातकालीन SOS: तत्काल सहायता की आवश्यकता है! उपयोगकर्ता का स्थान GPS द्वारा स्वतः प्राप्त कर लिया गया है। नजदीकी एम्बुलेंस भेजी जा रही है।"</div>
+                    <div style="font-style: normal;"><strong>KA:</strong> [${now}] "ರಕ್ಷಕ್ ನಿಂದ ತುರ್ತು SOS: ತಕ್ಷಣದ ಸಹಾಯದ ಅಗತ್ಯವಿದೆ! ಜಿಪಿಎಸ್ ಮೂಲಕ ಬಳಕೆದಾರರ ಸ್ಥಳವನ್ನು ಸ್ವಯಂ-ಪತ್ತೆ ಮಾಡಲಾಗಿದೆ. ಹತ್ತಿರದ ಆಂಬ್ಯುಲೆನ್ಸ್ ಅನ್ನು ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ."</div>
+                `;
+            }
         }
 
         function closeSOSModal() {
@@ -534,6 +545,9 @@
         });
 
     </script>
+
+
+    <script type="module" src="js/auth-nav.js"></script>
 
 </body>
 

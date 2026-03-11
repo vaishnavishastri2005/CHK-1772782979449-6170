@@ -74,14 +74,16 @@ body::before{
   position:fixed;
   top:0;
   width:100%;
-  height:68px;
+  height:60px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 2rem;
-  background:rgba(8,12,16,.85);
-  border-bottom:1px solid var(--border);
-  backdrop-filter:blur(20px);
+  background:rgba(8,12,16,.65);
+  border-bottom:1px solid rgba(255,59,59,0.15);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
   z-index:1000;
 }
 
@@ -115,20 +117,23 @@ body::before{
 
 .nav-links a{
   text-decoration:none;
-  padding:7px 14px;
+  padding:6px 14px;
   color:var(--text-sub);
-  font-size:.875rem;
-  border-radius:var(--radius-sm);
+  font-size:.82rem;
+  font-weight: 500;
+  border-radius:20px;
   transition:var(--transition);
 }
 
 .nav-links a:hover{
-  background:rgba(255,59,59,.08);
+  background:rgba(255,255,255,.05);
   color:var(--text);
+  transform: translateY(-1px);
 }
 
 .nav-links a.active{
   color:var(--primary);
+  background:rgba(255,59,59,.1);
 }
 
 .btn{
@@ -137,6 +142,7 @@ body::before{
   gap:8px;
   padding:10px 22px;
   font-weight:600;
+  text-decoration:none;
   font-size:.9rem;
   border:none;
   border-radius:var(--radius-sm);
@@ -244,6 +250,11 @@ body::before{
   border-color:var(--primary);
 }
 
+select.form-control option {
+  background-color: var(--bg-card);
+  color: var(--text);
+}
+
 .badge{
   display:inline-flex;
   align-items:center;
@@ -283,7 +294,9 @@ body::before{
 .hero-title{
   font-family:'Space Grotesk',sans-serif;
   font-weight:800;
-  font-size:clamp(2.8rem,5vw,4rem);
+  font-size:clamp(2.2rem,4vw,3.2rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .hero-title span{

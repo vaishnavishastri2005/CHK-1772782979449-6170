@@ -1,47 +1,63 @@
 const express = require('express');
-const router  = express.Router();
-const db      = require('../db');
+const router = express.Router();
+const db = require('../sheets-db');
 
-let broadcast = () => {};
+let broadcast = () => { };
 router.setBroadcast = (fn) => { broadcast = fn; };
 
-// Get all emergencies
+// GET /api/emergencies  – list all
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await db.query(
-      `SELECT e.*, u.name AS reporter_name
-       FROM emergencies e
-       LEFT JOIN users u ON e.reported_by = u.id
-       ORDER BY e.created_at DESC`
-    );
-    res.json({ success: true, data: rows });
+    const emergencies = await db.readSheet('emergencies');
+    const users = await db.readSheet('users');
+
+    // Join reporter name
+    const data = emergencies.map(e => {
+      const reporter = users.find(u => String(u.id) === String(e.reported_by));
+      return { ...e, reporter_name: reporter ? reporter.name : null };
+    });
+
+    // Sort newest first by created_at
+    data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// Get single emergency
+// GET /api/emergencies/stats/summary
+router.get('/stats/summary', async (req, res) => {
+  try {
+    const rows = await db.readSheet('emergencies');
+    res.json({
+      success: true,
+      data: {
+        total: rows.length,
+        pending: rows.filter(r => r.status === 'pending').length,
+        dispatched: rows.filter(r => r.status === 'dispatched').length,
+        en_route: rows.filter(r => r.status === 'en_route').length,
+        resolved: rows.filter(r => r.status === 'resolved').length,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/emergencies/:id
 router.get('/:id', async (req, res) => {
   try {
-    const [rows] = await db.query(
-      `SELECT e.*, u.name AS reporter_name
-       FROM emergencies e
-       LEFT JOIN users u ON e.reported_by = u.id
-       WHERE e.id = ?`, 
-      [req.params.id]
-    );
-
-    if (!rows.length) {
-      return res.status(404).json({ success: false, error: 'Not found' });
-    }
-
-    res.json({ success: true, data: rows[0] });
+    const rows = await db.readSheet('emergencies');
+    const row = rows.find(r => String(r.id) === String(req.params.id));
+    if (!row) return res.status(404).json({ success: false, error: 'Not found' });
+    res.json({ success: true, data: row });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// Create emergency
+// POST /api/emergencies  – create
 router.post('/', async (req, res) => {
   const { patient_name, emergency_type, severity, description, latitude, longitude, address, reported_by } = req.body;
 
@@ -50,27 +66,26 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const [result] = await db.query(
-      `INSERT INTO emergencies 
-      (patient_name, emergency_type, severity, description, latitude, longitude, address, status, reported_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
-      [patient_name, emergency_type, severity, description || '', latitude, longitude, address || '', reported_by || null]
-    );
+    const newRow = await db.appendRow('emergencies', {
+      patient_name,
+      emergency_type,
+      severity,
+      description: description || '',
+      latitude,
+      longitude,
+      address: address || '',
+      status: 'pending',
+      reported_by: reported_by || '',
+    });
 
-    const [newRow] = await db.query(
-      'SELECT * FROM emergencies WHERE id = ?', 
-      [result.insertId]
-    );
-
-    broadcast({ event: 'new_emergency', data: newRow[0] });
-
-    res.status(201).json({ success: true, data: newRow[0] });
+    broadcast({ event: 'new_emergency', data: newRow });
+    res.status(201).json({ success: true, data: newRow });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// Update status
+// PUT /api/emergencies/:id/status
 router.put('/:id/status', async (req, res) => {
   const { status } = req.body;
   const validStatuses = ['pending', 'dispatched', 'en_route', 'arrived', 'resolved', 'cancelled'];
@@ -80,38 +95,9 @@ router.put('/:id/status', async (req, res) => {
   }
 
   try {
-    await db.query(
-      'UPDATE emergencies SET status = ? WHERE id = ?',
-      [status, req.params.id]
-    );
-
-    const [rows] = await db.query(
-      'SELECT * FROM emergencies WHERE id = ?',
-      [req.params.id]
-    );
-
-    broadcast({ event: 'emergency_status_update', data: rows[0] });
-
-    res.json({ success: true, data: rows[0] });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Summary stats
-router.get('/stats/summary', async (req, res) => {
-  try {
-    const [stats] = await db.query(`
-      SELECT
-        COUNT(*) AS total,
-        SUM(status = 'pending') AS pending,
-        SUM(status = 'dispatched') AS dispatched,
-        SUM(status = 'en_route') AS en_route,
-        SUM(status = 'resolved') AS resolved
-      FROM emergencies
-    `);
-
-    res.json({ success: true, data: stats[0] });
+    const updated = await db.updateRowById('emergencies', req.params.id, { status });
+    broadcast({ event: 'emergency_status_update', data: updated });
+    res.json({ success: true, data: updated });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
